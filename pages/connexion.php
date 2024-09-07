@@ -1,4 +1,9 @@
+<title>FAF - Connexion</title>
+</head>
+
 <body>
+
+
     <div class="container-fluid my-4">
         <div id="divConnexion" class="col-4 m-auto">
             <h1 class="text-center" id="titreConnexion">Connexion</h1>
@@ -17,8 +22,8 @@
                 </div>
 
                 <div class="my-1 text-right">
-                    <a href="https://424x.cgodin.qc.ca/faf/enregistrement.php">Créer un compte</a> | <a
-                        href="https://424x.cgodin.qc.ca/faf/MotPasseOublie.php">Mot de passe oublié</a>
+                    <a href="./pages/inscription.php">Créer un compte</a> |
+                    <a href="">Mot de passe oublié</a>
                 </div>
 
                 <div class="d-flex">
