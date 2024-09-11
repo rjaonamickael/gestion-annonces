@@ -1,1 +1,3 @@
-Bienvenue
+<?php
+    echo 'Page accueil ...';
+?>
