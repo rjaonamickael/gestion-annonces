@@ -7,7 +7,7 @@
     <div class="container-fluid my-4">
         <div id="divConnexion" class="col-4 m-auto">
             <h1 class="text-center" id="titreConnexion">Connexion</h1>
-            <form id="formConnexion" action="https://424x.cgodin.qc.ca/faf/EnvoieConnexion.php" method="POST">
+            <form id="formConnexion" action="./outils/EnvoieConnexion.php" method="POST">
 
                 <div class="form-group">
                     <label for="tbEmail">Email</label>

@@ -1,10 +1,8 @@
-<?php 
-        include('../composants/header.php');
-    ?>
+<?php include('../composants/header.php');?>
 
 <div class="container col-md-5 jumbotron">
     <h2 class="text-center">Enregistrement</h2><br>
-    <form id="formInscription" method="POST" action="https://424x.cgodin.qc.ca/faf/EnvoieEnregistrement.php">
+    <form id="formInscription" method="POST" action="../outils/EnvoieEnregistrement.php">
         <div class="form-row">
             <div class="form-group col-md-12">
                 <label>Courriel</label>
@@ -17,7 +15,7 @@
             <div class="form-group col-md-12">
                 <label>Confirmation du Courriel</label>
                 <input type="email" class="form-control" id="tbinscriptionEmailConfirmation"
-                    name="tbinscriptionEmailEmail" placeholder="Confirmez le courriel">
+                    name="tbinscriptionEmailConfirmation" placeholder="Confirmez le courriel">
                 <p id="errEmailConfirm" class="text-danger font-weight-bold"></p>
             </div>
         </div>
@@ -37,6 +35,7 @@
                 <p id="errMdpConfirm" class="text-danger font-weight-bold"></p>
             </div>
         </div>
+
         <div>
             <input type="submit" value="S&#39;inscrire" class="btn btn-primary col-md-12" id="btnInscription">
 
@@ -49,7 +48,4 @@
     </form>
 </div>
 
-
-<?php 
-        include('../composants/footer.php');
-    ?>
+<?php include('../composants/footer.php');?>
