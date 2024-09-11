@@ -1,21 +1,22 @@
 <?php
-include 'DBConnexion.php';
+    include 'DBConnexion.php';
 
-// Nom de la base de donnees
-$strNomBD = "projet2";
+    // Nom de la base de donnees
+    $strNomBD = "projet2";
+    
+    // Recuperation des informations du serveur
+    $strNomServeur = $_SERVER["SERVER_NAME"];
+    $strInfosSensibles = str_replace(".", "-", $strNomServeur) . ".php";
+    
+    // Création de l'objet de connexion
+    $mysql = new MySQL($strNomBD, $strInfosSensibles);
+    
+    // Connexion à la base de données
+    $mysql->connexion();
+    
+    // Sélectionner la base de données
+    $mysql->selectionneBD();
 
-// Recuperation des informations du serveur
-$strNomServeur = $_SERVER["SERVER_NAME"];
-$strInfosSensibles = str_replace(".", "-", $strNomServeur) . ".php";
-
-// Création de l'objet de connexion
-$mysql = new MySQL($strNomBD, $strInfosSensibles);
-
-// Connexion à la base de données
-$mysql->connexion();
-
-// Sélectionner la base de données
-$mysql->selectionneBD();
 
 // Requêtes pour créer les tables
 $requeteUtilisateurs = "
@@ -23,6 +24,7 @@ CREATE TABLE IF NOT EXISTS utilisateurs (
     NoUtilisateur INT(3) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     Courriel VARCHAR(50) NOT NULL UNIQUE,
     MotDePasse VARCHAR(15) NOT NULL,
+    Sel VARCHAR(16) NOT NULL,
     Creation DATETIME DEFAULT CURRENT_TIMESTAMP,
     NbConnexions INT(4) UNSIGNED DEFAULT 0,
     Statut TINYINT(1) NOT NULL,
@@ -83,25 +85,42 @@ if ($mysql->cBD->error) {
 $emailAdmin = 'admin@gmail.com';
 $motdepasseAdmin = 'Secret123';
 
-// Préparer les données pour l'insertion
-$currentDateTime = date('Y-m-d H:i:s'); // Date et heure actuelles
+// Requête SQL préparée avec un "placeholder" ? pour l'email
+$query = $mysql->cBD->prepare("SELECT COUNT(*) FROM utilisateurs WHERE Courriel = ?");
 
-$mysql->insereEnregistrement(
-    'utilisateurs',
-    NULL, // NoUtilisateur, AUTO_INCREMENT
-    $emailAdmin,
-    $motdepasseAdmin,
-    $currentDateTime, // Creation
-    0, // NbConnexions
-    0, // Statut
-    NULL, // NoEmpl
-    'Administrateur',
-    'Admin',
-    '',
-    '',
-    '',
-    NULL // Modification (NULL par défaut)
-);
+// Lier la variable $emailAdmin à ce "placeholder"
+$query->bind_param('s', $emailAdmin);
+
+// Exécuter la requête
+$query->execute();
+
+// Récupérer le résultat
+$query->bind_result($count);
+$query->fetch();
+
+if ($count == 0) {
+    // L'utilisateur n'existe pas, on peut l'insérer
+    $currentDateTime = date('Y-m-d H:i:s'); // Date et heure actuelles
+
+    $mysql->insereEnregistrement(
+        'utilisateurs',
+        NULL,                // NoUtilisateur, AUTO_INCREMENT
+        $emailAdmin,
+        $motdepasseAdmin,
+        $motdepasseAdmin,
+        $currentDateTime,    // Creation
+        0,                   // NbConnexions
+        1,                   // Statut
+        NULL,                // NoEmpl
+        'Administrateur',
+        'Admin',
+        '',
+        '',
+        '',  
+        NULL                   // Modification (NULL par défaut)
+    );
+
+}
 
 // Déconnexion
 $mysql->deconnexion();

@@ -11,38 +11,40 @@ require '../configurations/phpmailer.config.php';
 require '../configurations/security.config.php';
 
 
-function sendEmail($dest,$subject,$body) {
+function sendEmail($dest, $subject, $body)
+{
     //Create an instance; passing `true` enables exceptions
-$mail = new PHPMailer(true);
+    $mail = new PHPMailer(true);
 
-try {
-    //Server settings
-    //$mail->SMTPDebug = SMTP::DEBUG_SERVER;                    //Enable verbose debug output
-    $mail->isSMTP();                                            //Send using SMTP
-    $mail->Host       = HOST;                                   //Set the SMTP server to send through
-    $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
-    $mail->Username   = USERNAME;                               //SMTP username
-    $mail->Password   = PASSWORD;                               //SMTP password
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
-    $mail->Port       = PORT;                                   //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+    try {
+        //Server settings
+        //$mail->SMTPDebug = SMTP::DEBUG_SERVER;                    //Enable verbose debug output
+        $mail->isSMTP();                                            //Send using SMTP
+        $mail->Host = HOST;                                   //Set the SMTP server to send through
+        $mail->SMTPAuth = true;                                   //Enable SMTP authentication
+        $mail->Username = USERNAME;                               //SMTP username
+        $mail->Password = PASSWORD;                               //SMTP password
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
+        $mail->Port = PORT;                                   //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
 
-    //Recipients
-    $mail->setFrom('no-reply@projetphp.gg', 'no-reply@projetphp.gg');
-    $mail->addAddress($dest);                                   //Name is optional
+        //Recipients
+        $mail->setFrom('no-reply@projetphp.gg', 'no-reply@projetphp.gg');
+        $mail->addAddress($dest);                                   //Name is optional
 
-    //Content
-    $mail->isHTML(true);                                        //Set email format to HTML
-    $mail->Subject = $subject;
-    $mail->Body    = $body;
+        //Content
+        $mail->isHTML(true);                                        //Set email format to HTML
+        $mail->Subject = $subject;
+        $mail->Body = $body;
 
-    $mail->send();
+        $mail->send();
 
     } catch (Exception $e) {
         echo "<script type='text/javascript'>console.log($e);</script>";
     }
 }
 
-function messageInscription($email){
+function messageInscription($email)
+{
     $message = "
         <html>
         <head>
@@ -60,7 +62,8 @@ function messageInscription($email){
     return $message;
 }
 
-function scriptVerification(){
+function scriptVerification()
+{
     $script = "
         <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -113,4 +116,52 @@ function scriptVerification(){
 }
 
 
- ?>
+function connectionDb()
+{
+    include 'DBConnexion.php';
+
+    // Nom de la base de donnees
+    $strNomBD = "projet2";
+    
+    // Recuperation des informations du serveur
+    $strNomServeur = $_SERVER["SERVER_NAME"];
+    $strInfosSensibles = str_replace(".", "-", $strNomServeur) . ".php";
+    
+    // Création de l'objet de connexion
+    $mysql = new MySQL($strNomBD, $strInfosSensibles);
+    
+    // Connexion à la base de données
+    $mysql->connexion();
+    
+    // Sélectionner la base de données
+    $mysql->selectionneBD();
+
+    return $mysql;
+}
+
+function enregistrementUtilsateur($mysql,$email,$passwordHashed,$salt){
+ 
+    
+    // Date et heure actuelles
+    $currentDateTime = date('Y-m-d H:i:s');
+
+    $mysql->insereEnregistrement(
+        'utilisateurs',
+        NULL,                // NoUtilisateur, AUTO_INCREMENT
+        $email,
+        $passwordHashed,
+        $salt,
+        $currentDateTime,    // Creation
+        0,                   // NbConnexions
+        0,                   // Statut
+        NULL,                // NoEmpl
+        '',
+        '',
+        '',
+        '',
+        '',  
+        NULL                   // Modification (NULL par défaut)
+    );
+    
+}
+?>

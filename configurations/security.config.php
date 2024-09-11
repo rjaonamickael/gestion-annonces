@@ -1,7 +1,7 @@
 <?php
 // config.php
 define('HASH_TYPE', 'sha256');
-define('SALT_SIZE', 24);
+define('SALT_SIZE', 8);
 
 
 ?>
