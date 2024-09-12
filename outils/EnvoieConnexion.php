@@ -16,7 +16,7 @@ $mysql->connexion();
 $mysql->selectionneBD();
 
 // Vérifier les informations d'identification
-$queryCheckUser = "SELECT MotDePasse, Statut FROM utilisateurs WHERE Courriel = ?";
+$queryCheckUser = "SELECT MotDePasse, Statut FROM utilisateurs WHERE Courriel = ? and Statut <> '0'";
 $stmt = $mysql->cBD->prepare($queryCheckUser);
 $stmt->bind_param("s", $email);
 $stmt->execute();
@@ -53,6 +53,7 @@ $_SESSION['errors'] = $errors;
 $_SESSION['form_data'] = [
     'email' => $email
 ];
+
 header("Location: ../");
 exit();
 ?>

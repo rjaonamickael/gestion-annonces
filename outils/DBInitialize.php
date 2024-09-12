@@ -80,7 +80,7 @@ if ($mysql->cBD->error) {
 /* Commenter apres la premiere initialisation */
 
 // Créer un utilisateur administrateur
-$emailAdmin = 'admin@gmail.com';
+/*$emailAdmin = 'admin@gmail.com';
 $motdepasseAdmin = 'Secret123';
 
 // Préparer les données pour l'insertion
@@ -93,7 +93,7 @@ $mysql->insereEnregistrement(
     $motdepasseAdmin,
     $currentDateTime, // Creation
     0, // NbConnexions
-    0, // Statut
+    1, // Statut
     NULL, // NoEmpl
     'Administrateur',
     'Admin',
@@ -101,7 +101,7 @@ $mysql->insereEnregistrement(
     '',
     '',
     NULL // Modification (NULL par défaut)
-);
+);*/
 
 // Déconnexion
 $mysql->deconnexion();
