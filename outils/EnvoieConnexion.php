@@ -16,7 +16,7 @@ $mysql->connexion();
 $mysql->selectionneBD();
 
 // Vérifier les informations d'identification
-$queryCheckUser = "SELECT MotDePasse, Statut FROM utilisateurs WHERE Courriel = ? and Statut <> '0'";
+$queryCheckUser = "SELECT * FROM utilisateurs WHERE Courriel = ? and Statut <> '0'";
 $stmt = $mysql->cBD->prepare($queryCheckUser);
 $stmt->bind_param("s", $email);
 $stmt->execute();
@@ -27,19 +27,26 @@ if ($result->num_rows === 0) {
 } else {
     $row = $result->fetch_assoc();
     $hashedPassword = $row['MotDePasse'];
-
+    $userId = $row['NoUtilisateur'];
+    
     // Vérifier le mot de passe
     if ($motdepasse === $row['MotDePasse']) {
         // Connexion réussie
-        // Mettre à jour le nombre de connexions
-        $queryUpdateConnexions = "UPDATE utilisateurs SET NbConnexions = NbConnexions + 1 WHERE Courriel = ?";
-        $stmtUpdate = $mysql->cBD->prepare($queryUpdateConnexions);
-        $stmtUpdate->bind_param("s", $email);
+        // Mettre à jour le nombre de connexions dans utilisateurs
+        $queryUpdateUtilisateur = "UPDATE utilisateurs SET NbConnexions = NbConnexions + 1 WHERE NoUtilisateur = ?";
+        $stmtUpdate = $mysql->cBD->prepare($queryUpdateUtilisateur);
+        $stmtUpdate->bind_param("i", $userId);
         $stmtUpdate->execute();
+
+        // Insérer une ligne dans la table connexions
+        $queryInsertConnexion = "INSERT INTO connexions (NoUtilisateur, Connexion) VALUES (?, NOW())";
+        $stmtInsert = $mysql->cBD->prepare($queryInsertConnexion);
+        $stmtInsert->bind_param("i", $userId);
+        $stmtInsert->execute();
 
         // Déconnexion
         $mysql->deconnexion();
-        header("Location: ../pages/accueil.php");
+        header("Location: ../pages/gestion_annonce.php");
         exit();
     } else {
         $errors = ["Identifiant ou mot de passe incorrect."];
