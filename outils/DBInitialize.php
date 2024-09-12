@@ -82,7 +82,7 @@ if ($mysql->cBD->error) {
 /* Commenter apres la premiere initialisation */
 
 // Créer un utilisateur administrateur
-$emailAdmin = 'admin@gmail.com';
+/*$emailAdmin = 'admin@gmail.com';
 $motdepasseAdmin = 'Secret123';
 
 $query = $mysql->cBD->prepare("SELECT COUNT(*) FROM utilisateurs WHERE Courriel = ?");
@@ -121,7 +121,7 @@ if ($count == 0) {
         NULL                   // Modification (NULL par défaut)
     );
 
-}
+}*/
 
 // Déconnexion
 $mysql->deconnexion();
