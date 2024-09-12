@@ -121,7 +121,7 @@ if ($count == 0) {
         NULL                   // Modification (NULL par défaut)
     );
 
-}
+}*/
 
 // Déconnexion
 $mysql->deconnexion();
