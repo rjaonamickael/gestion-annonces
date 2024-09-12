@@ -7,7 +7,7 @@
     <div class="container-fluid my-4">
         <div id="divConnexion" class="col-4 m-auto">
             <h1 class="text-center" id="titreConnexion">Connexion</h1>
-            <form id="formConnexion" action="https://424x.cgodin.qc.ca/faf/EnvoieConnexion.php" method="POST">
+            <form id="formConnexion" action="./outils/EnvoieConnexion.php" method="POST">
 
                 <div class="form-group">
                     <label for="tbEmail">Email</label>
@@ -33,3 +33,17 @@
             </form>
         </div>
     </div>
+
+
+    <?php
+        //$passwordHash = password_hash($password, PASSWORD_DEFAULT);
+
+        // Déboguer
+        // echo "<pre>";
+        // print_r($passwordHash);
+        // echo "</pre>";
+
+        // echo "<pre>";
+        // print_r(password_verify("ADve321", "$2y$10$7dm3LbaH/u5ARnPwlVLLnuWNSFN53edXQMEojtjVSFyyCplT22hn2"));
+        // echo "</pre>";/
+?>
