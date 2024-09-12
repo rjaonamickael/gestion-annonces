@@ -4,4 +4,6 @@
 
 <?php include('./composants/footer.php');?>
 
-<?php include('./outils/DBInitialize.php');?>
+<?php 
+include('./outils/DBInitialize.php');
+?>
