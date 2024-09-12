@@ -74,6 +74,7 @@ function scriptVerification()
             const passwordConfirmInput = document.getElementById('tbInscriptionMDPConfirmation');
             const emailError = document.getElementById('errEmailConfirm');
             const passwordError = document.getElementById('errMdpConfirm');
+            const urlParams = new URLSearchParams(window.location.search);
 
             form.addEventListener('submit', function(event) {
                 let valid = true;
@@ -107,8 +108,15 @@ function scriptVerification()
                     // Empêcher l'envoi du formulaire si les validations échouent
                     event.preventDefault();
                 }
+
+                
+                if(urlParams.has('emailExists')) {
+                    const emailErrorPrincipal = document.getElementById('errEmail');
+                    emailErrorPrincipal.textContent = 'L\'adresse email est déjà utilisée.';
+                }
             });
         });
+        
     </script>
     ";
 
@@ -122,26 +130,27 @@ function connectionDb()
 
     // Nom de la base de donnees
     $strNomBD = "projet2";
-    
+
     // Recuperation des informations du serveur
     $strNomServeur = $_SERVER["SERVER_NAME"];
     $strInfosSensibles = str_replace(".", "-", $strNomServeur) . ".php";
-    
+
     // Création de l'objet de connexion
     $mysql = new MySQL($strNomBD, $strInfosSensibles);
-    
+
     // Connexion à la base de données
     $mysql->connexion();
-    
+
     // Sélectionner la base de données
     $mysql->selectionneBD();
 
     return $mysql;
 }
 
-function enregistrementUtilsateur($mysql,$email,$passwordHashed,$salt){
- 
-    
+function enregistrementUtilsateur($mysql, $email, $passwordHashed, $salt)
+{
+
+
     // Date et heure actuelles
     $currentDateTime = date('Y-m-d H:i:s');
 
@@ -159,9 +168,29 @@ function enregistrementUtilsateur($mysql,$email,$passwordHashed,$salt){
         '',
         '',
         '',
-        '',  
+        '',
         NULL                   // Modification (NULL par défaut)
     );
-    
+
+}
+
+function verificationEmail($mysql, $email): int
+{
+    // Requête SQL préparée avec un "placeholder" ? pour l'email
+    $query = $mysql->cBD->prepare("SELECT COUNT(*) FROM utilisateurs WHERE Courriel = ?");
+
+    // Lier la variable $emailAdmin à ce "placeholder"
+    $query->bind_param('s', $email);
+
+    // Exécuter la requête
+    $query->execute();
+
+    // Récupérer le résultat
+    $count = 0;
+    $query->bind_result($count);
+    $query->fetch();
+    $query->close();
+
+    return $count;
 }
 ?>

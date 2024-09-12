@@ -85,7 +85,6 @@ if ($mysql->cBD->error) {
 $emailAdmin = 'admin@gmail.com';
 $motdepasseAdmin = 'Secret123';
 
-// Requête SQL préparée avec un "placeholder" ? pour l'email
 $query = $mysql->cBD->prepare("SELECT COUNT(*) FROM utilisateurs WHERE Courriel = ?");
 
 // Lier la variable $emailAdmin à ce "placeholder"
@@ -97,6 +96,8 @@ $query->execute();
 // Récupérer le résultat
 $query->bind_result($count);
 $query->fetch();
+$query->close();
+
 
 if ($count == 0) {
     // L'utilisateur n'existe pas, on peut l'insérer

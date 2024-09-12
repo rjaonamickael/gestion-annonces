@@ -66,46 +66,46 @@ echo scriptVerification();
         $password = $_POST['tbInscriptionMDP'];
         $passwordConfirm = $_POST['tbInscriptionMDPConfirmation'];
 
-        // Vérifier si les emails et les mots de passe correspondent
+        // Préparation de la connexion à la base de données
+        // Nom de la base de donnees
+        $strNomBD = "projet2";
+        // Recuperation des informations du serveur
+        $strNomServeur = $_SERVER["SERVER_NAME"];
+        $strInfosSensibles = str_replace(".", "-", $strNomServeur) . ".php";
+        // Création de l'objet de connexion
+        $mysql = new MySQL($strNomBD, $strInfosSensibles);
+        // Connexion à la base de données
+        $mysql->connexion();
+        // Sélectionner la base de données
+        $mysql->selectionneBD();
+
+
         if ($email === $emailConfirm && $password === $passwordConfirm) {
-            // Hash du mot de passe pour une sécurité accrue
-            $salt = /*"50c035e8b9f566c81ab141f93ce98e70984999db8d7608b0";*/ bin2hex(random_bytes(SALT_SIZE));
-            $passwordHashed = hash(HASH_TYPE, $salt . $password);
+            //Vérifiez si le mails a été déjà utilisé
+            if (verificationEmail($mysql, $email) == 1) {
+                echo "<script>alert('L\'adresse email est déjà utilisée.')</script>";
+                $mysql->deconnexion();
+            } else {
+                // Hash du mot de passe pour une sécurité accrue
+                $salt = bin2hex(random_bytes(SALT_SIZE));
+                $passwordHashed = hash(HASH_TYPE, $salt . $password);
 
-            // Enregistrer l'utilisateur dans la base de données
-            // Nom de la base de donnees
-            $strNomBD = "projet2";
+                enregistrementUtilsateur($mysql, $email, $password, $salt);
+                // Déconnexion
+                $mysql->deconnexion();
 
-            // Recuperation des informations du serveur
-            $strNomServeur = $_SERVER["SERVER_NAME"];
-            $strInfosSensibles = str_replace(".", "-", $strNomServeur) . ".php";
+                // Préparer l'email de confirmation
+                $dest = $email;
+                $objet = "Confirmation de votre inscription";
+                $message = messageInscription($email);
 
-            // Création de l'objet de connexion
-            $mysql = new MySQL($strNomBD, $strInfosSensibles);
+                // Envoi de l'email
+                sendEmail($dest, $objet, $message);
 
-            // Connexion à la base de données
-            $mysql->connexion();
-
-            // Sélectionner la base de données
-            $mysql->selectionneBD();
-
-            enregistrementUtilsateur($mysql, $email, $passwordHashed, $salt);
-
-            // Déconnexion
-            $mysql->deconnexion();
-
-            // Préparer l'email de confirmation
-            $dest = $email;
-            $objet = "Confirmation de votre inscription";
-            $message = messageInscription($email);
-
-            // Envoi de l'email
-            sendEmail($dest, $objet, $message);
-
-        } else {
-            echo "<script type='text/javascript'>alert('Erreur durant la creation de votre compte.');</script>";
+            }
         }
     }
+
     ?>
 
     <?php include('../composants/footer.php'); ?>
