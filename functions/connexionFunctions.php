@@ -8,7 +8,6 @@ require '../librairies/phpmailer/src/Exception.php';
 require '../librairies/phpmailer/src/PHPMailer.php';
 require '../librairies/phpmailer/src/SMTP.php';
 require '../configurations/phpmailer.config.php';
-require '../configurations/security.config.php';
 
 
 function sendEmail($dest, $subject, $body)
@@ -191,5 +190,24 @@ function verificationEmail($mysql, $email): int
     $query->close();
 
     return $count;
+}
+
+function messageRcuperationMdp($email)
+{
+    $message = "
+        <html>
+        <head>
+            <title>Récupération de votre mot de passe</title>
+        </head>
+        <body>
+            <p>Bonjour,</p>
+            <p>Nous avons recu une demande de récuperation de votre mot de passe. Veuillez cliquer sur le lien ci-dessous pour confirmer cela :</p>
+            <p><a href='http://localhost:8000/pages/recuperationMdp.php?email=" . urlencode($email) . "'>Récuperer mon mot de passe</a></p>
+            <p>Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.</p>
+        </body>
+        </html>
+        ";
+
+    return $message;
 }
 ?>
