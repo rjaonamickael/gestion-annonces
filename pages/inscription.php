@@ -87,10 +87,9 @@ echo scriptVerification();
                 $mysql->deconnexion();
             } else {
                 // Hash du mot de passe pour une sécurité accrue
-                $salt = bin2hex(random_bytes(SALT_SIZE));
-                $passwordHashed = hash(HASH_TYPE, $salt . $password);
+                $passwordHashed = hash(HASH_TYPE,  $password);
 
-                enregistrementUtilsateur($mysql, $email, $password, $salt);
+                enregistrementUtilsateur($mysql, $email, $passwordHashed);
                 // Déconnexion
                 $mysql->deconnexion();
 
@@ -101,6 +100,7 @@ echo scriptVerification();
 
                 // Envoi de l'email
                 sendEmail($dest, $objet, $message);
+                
 
             }
         }
