@@ -1,21 +1,21 @@
 <?php
-    include 'DBConnexion.php';
+include 'DBConnexion.php';
 
-    // Nom de la base de donnees
-    $strNomBD = "projet2";
-    
-    // Recuperation des informations du serveur
-    $strNomServeur = $_SERVER["SERVER_NAME"];
-    $strInfosSensibles = str_replace(".", "-", $strNomServeur) . ".php";
-    
-    // Création de l'objet de connexion
-    $mysql = new MySQL($strNomBD, $strInfosSensibles);
-    
-    // Connexion à la base de données
-    $mysql->connexion();
-    
-    // Sélectionner la base de données
-    $mysql->selectionneBD();
+// Nom de la base de donnees
+$strNomBD = "projet2";
+
+// Recuperation des informations du serveur
+$strNomServeur = $_SERVER["SERVER_NAME"];
+$strInfosSensibles = str_replace(".", "-", $strNomServeur) . ".php";
+
+// Création de l'objet de connexion
+$mysql = new MySQL($strNomBD, $strInfosSensibles);
+
+// Connexion à la base de données
+$mysql->connexion();
+
+// Sélectionner la base de données
+$mysql->selectionneBD();
 
 
 // Requêtes pour créer les tables
@@ -23,8 +23,7 @@ $requeteUtilisateurs = "
 CREATE TABLE IF NOT EXISTS utilisateurs (
     NoUtilisateur INT(3) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     Courriel VARCHAR(50) NOT NULL UNIQUE,
-    MotDePasse VARCHAR(15) NOT NULL,
-    Sel VARCHAR(16) NOT NULL,
+    MotDePasse VARCHAR(64) NOT NULL,
     Creation DATETIME DEFAULT CURRENT_TIMESTAMP,
     NbConnexions INT(4) UNSIGNED DEFAULT 0,
     Statut TINYINT(1) NOT NULL,
@@ -82,7 +81,7 @@ if ($mysql->cBD->error) {
 /* Commenter apres la premiere initialisation */
 
 // Créer un utilisateur administrateur
-/*$emailAdmin = 'admin@gmail.com';
+$emailAdmin = 'admin@gmail.com';
 $motdepasseAdmin = 'Secret123';
 
 $query = $mysql->cBD->prepare("SELECT COUNT(*) FROM utilisateurs WHERE Courriel = ?");
@@ -107,8 +106,7 @@ if ($count == 0) {
         'utilisateurs',
         NULL,                // NoUtilisateur, AUTO_INCREMENT
         $emailAdmin,
-        $motdepasseAdmin,
-        $motdepasseAdmin,
+        hash('sha256', $motdepasseAdmin),
         $currentDateTime,    // Creation
         0,                   // NbConnexions
         1,                   // Statut
@@ -117,11 +115,11 @@ if ($count == 0) {
         'Admin',
         '',
         '',
-        '',  
+        '',
         NULL                   // Modification (NULL par défaut)
     );
 
-}*/
+}
 
 // Déconnexion
 $mysql->deconnexion();
