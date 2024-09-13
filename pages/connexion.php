@@ -33,10 +33,10 @@
                         autocomplete="off">
                     <p id="errMdp" class="text-danger font-weight-bold">
                         <?php
-                        //session_start();
+                        
                         if (isset($_SESSION['errors']) && in_array("Mot de passe incorrect.", $_SESSION['errors'])) {
                             echo "Mot de passe incorrect.";
-                            unset($_SESSION['errors']); // Effacer les erreurs après les avoir affichées
+                            unset($_SESSION['errors']);
                         }
                         ?>
                     </p>
@@ -131,12 +131,12 @@
 
         $mysql->deconnexion();
 
-        // Stocker les données du formulaire dans la session
+       
         $_SESSION['form_data'] = [
             'email' => $email
         ];
 
-        // Rediriger pour recharger la page et afficher les erreurs
+        
         header("Location: " . $_SERVER['PHP_SELF']);
         exit();
     }
