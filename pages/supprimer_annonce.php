@@ -32,7 +32,7 @@ if (!$annonce) {
     die("Annonce introuvable.");
 }
 
-
+// Handle deletion if confirmed
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['confirm']) && $_POST['confirm'] === 'oui') {
     $deleteQuery = "DELETE FROM annonces WHERE NoAnnonce = ?";
     $deleteStmt = $mysql->cBD->prepare($deleteQuery);
