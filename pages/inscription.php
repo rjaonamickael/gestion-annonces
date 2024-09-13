@@ -58,53 +58,85 @@ echo scriptVerification();
 
     <?php
 
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Recevoir les valeurs du formulaire   
+    $email = $_POST['tbinscriptionEmail'];
+    $emailConfirm = $_POST['tbinscriptionEmailConfirmation'];
+    $password = $_POST['tbInscriptionMDP'];
+    $passwordConfirm = $_POST['tbInscriptionMDPConfirmation'];
 
+    // Préparation de la connexion à la base de données
+    $strNomBD = "projet2";
+    $strNomServeur = $_SERVER["SERVER_NAME"];
+    $strInfosSensibles = str_replace(".", "-", $strNomServeur) . ".php";
+    
+    // Création de l'objet de connexion
+    $mysql = new MySQL($strNomBD, $strInfosSensibles);
+    $mysql->connexion();
+    $mysql->selectionneBD();
+
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Recevoir les valeurs du formulaire   
         $email = $_POST['tbinscriptionEmail'];
         $emailConfirm = $_POST['tbinscriptionEmailConfirmation'];
         $password = $_POST['tbInscriptionMDP'];
         $passwordConfirm = $_POST['tbInscriptionMDPConfirmation'];
-
+    
         // Préparation de la connexion à la base de données
-        // Nom de la base de donnees
         $strNomBD = "projet2";
-        // Recuperation des informations du serveur
         $strNomServeur = $_SERVER["SERVER_NAME"];
         $strInfosSensibles = str_replace(".", "-", $strNomServeur) . ".php";
+        
         // Création de l'objet de connexion
         $mysql = new MySQL($strNomBD, $strInfosSensibles);
-        // Connexion à la base de données
         $mysql->connexion();
-        // Sélectionner la base de données
         $mysql->selectionneBD();
-
-
+    
         if ($email === $emailConfirm && $password === $passwordConfirm) {
-            //Vérifiez si le mails a été déjà utilisé
+            // Vérifiez si l'adresse email a été déjà utilisée
             if (verificationEmail($mysql, $email) == 1) {
                 echo "<script>alert('L\'adresse email est déjà utilisée.')</script>";
                 $mysql->deconnexion();
             } else {
-                // Hash du mot de passe pour une sécurité accrue
-                $salt = bin2hex(random_bytes(SALT_SIZE));
-                $passwordHashed = hash(HASH_TYPE, $salt . $password);
-
-                enregistrementUtilsateur($mysql, $email, $password, $salt);
-                // Déconnexion
+                // Générer une valeur "Sel" pour la sécurité du mot de passe
+                $sel = bin2hex(random_bytes(16)); // Génère un "salt" de 16 octets et le convertit en chaîne hexadécimale
+    
+                // Hash du mot de passe avec le "salt" pour une sécurité accrue
+                $passwordHashed = hash(HASH_TYPE, $password . $sel);
+    
+                // Appel de la fonction insereEnregistrement avec les valeurs correctes
+                $mysql->insereEnregistrement(
+                    'utilisateurs',             // Nom de la table
+                    $email,                     // Courriel
+                    $passwordHashed,            // MotDePasse
+                    date('Y-m-d H:i:s'),        // Creation (date actuelle)
+                    null,                       // Modification (par défaut null si nouvel utilisateur)
+                    0,                          // NbConnexions
+                    null,                       // NoEmpl (aucun employé par défaut)
+                    'NomExemple',               // Nom (à adapter selon votre formulaire si disponible)
+                    'PrenomExemple',            // Prénom (à adapter selon votre formulaire si disponible)
+                    $sel,                       // Sel généré
+                    1,                          // Statut (actif)
+                    '0123456789',               // NoTelCellulaire (exemple, adapter selon votre besoin)
+                    null,                       // NoTelMaison
+                    null                        // NoTelTravail
+                );
+    
+                // Déconnexion de la base de données
                 $mysql->deconnexion();
-
-                // Préparer l'email de confirmation
+    
+                // Préparer et envoyer l'email de confirmation
                 $dest = $email;
                 $objet = "Confirmation de votre inscription";
                 $message = messageInscription($email);
-
-                // Envoi de l'email
                 sendEmail($dest, $objet, $message);
-
             }
+        } else {
+            echo "<script>alert('Les emails ou mots de passe ne correspondent pas.')</script>";
         }
     }
+}    
+
 
     ?>
 

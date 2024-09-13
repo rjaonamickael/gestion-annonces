@@ -53,7 +53,7 @@ function messageInscription($email)
         <body>
             <p>Bonjour,</p>
             <p>Merci de vous être inscrit sur notre site. Veuillez cliquer sur le lien ci-dessous pour confirmer votre adresse email :</p>
-            <p><a href='https://votresite.com/confirmation.php?email=" . urlencode($email) . "'>Confirmer mon email</a></p>
+            <p><a href='http://localhost:8000/pages/confirmationInscription.php?email=" . urlencode($email) . "'>Confirmer mon email</a></p>
             <p>Si vous n'avez pas demandé cette inscription, veuillez ignorer cet email.</p>
         </body>
         </html>
@@ -147,7 +147,7 @@ function connectionDb()
     return $mysql;
 }
 
-function enregistrementUtilsateur($mysql, $email, $passwordHashed, $salt)
+function enregistrementUtilsateur($mysql, $email, $passwordHashed)
 {
 
 
@@ -159,7 +159,6 @@ function enregistrementUtilsateur($mysql, $email, $passwordHashed, $salt)
         NULL,                // NoUtilisateur, AUTO_INCREMENT
         $email,
         $passwordHashed,
-        $salt,
         $currentDateTime,    // Creation
         0,                   // NbConnexions
         0,                   // Statut

@@ -1,10 +1,10 @@
 <?php
 include 'DBConnexion.php';
 
-// Nom de la base de données
+// Nom de la base de donnees
 $strNomBD = "projet2";
 
-// Récupération des informations du serveur
+// Recuperation des informations du serveur
 $strNomServeur = $_SERVER["SERVER_NAME"];
 $strInfosSensibles = str_replace(".", "-", $strNomServeur) . ".php";
 
@@ -13,15 +13,17 @@ $mysql = new MySQL($strNomBD, $strInfosSensibles);
 
 // Connexion à la base de données
 $mysql->connexion();
+
+// Sélectionner la base de données
 $mysql->selectionneBD();
+
 
 // Requêtes pour créer les tables
 $requeteUtilisateurs = "
 CREATE TABLE IF NOT EXISTS utilisateurs (
     NoUtilisateur INT(3) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     Courriel VARCHAR(50) NOT NULL UNIQUE,
-    MotDePasse VARCHAR(255) NOT NULL,
-    Sel VARCHAR(16) NOT NULL,
+    MotDePasse VARCHAR(64) NOT NULL,
     Creation DATETIME DEFAULT CURRENT_TIMESTAMP,
     NbConnexions INT(4) UNSIGNED DEFAULT 0,
     Statut TINYINT(1) NOT NULL,
@@ -31,7 +33,8 @@ CREATE TABLE IF NOT EXISTS utilisateurs (
     NoTelMaison VARCHAR(15),
     NoTelTravail VARCHAR(21),
     NoTelCellulaire VARCHAR(15),
-    Modification DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
+    Modification DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE (Courriel)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
 $requeteConnexions = "
@@ -75,43 +78,50 @@ if ($mysql->cBD->error) {
     die("Erreur lors de la création des tables : " . $mysql->cBD->error);
 }
 
+/* Commenter apres la premiere initialisation */
+
 // Créer un utilisateur administrateur
 $emailAdmin = 'admin@gmail.com';
 $motdepasseAdmin = 'Secret123';
-$sel = bin2hex(random_bytes(8)); // Génère un sel aléatoire
-$motdepasseHashed = password_hash($sel . $motdepasseAdmin, PASSWORD_BCRYPT);
 
-// Vérifier si l'administrateur existe déjà
 $query = $mysql->cBD->prepare("SELECT COUNT(*) FROM utilisateurs WHERE Courriel = ?");
+
+// Lier la variable $emailAdmin à ce "placeholder"
 $query->bind_param('s', $emailAdmin);
+
+// Exécuter la requête
 $query->execute();
+
+// Récupérer le résultat
 $query->bind_result($count);
 $query->fetch();
 $query->close();
 
+
 if ($count == 0) {
-    // L'utilisateur administrateur n'existe pas, on l'insère
+    // L'utilisateur n'existe pas, on peut l'insérer
     $currentDateTime = date('Y-m-d H:i:s'); // Date et heure actuelles
 
     $mysql->insereEnregistrement(
         'utilisateurs',
         NULL,                // NoUtilisateur, AUTO_INCREMENT
         $emailAdmin,
-        $motdepasseHashed,
-        $sel,
+        hash('sha256', $motdepasseAdmin),
         $currentDateTime,    // Creation
         0,                   // NbConnexions
-        1,                   // Statut (1 = Administrateur)
+        1,                   // Statut
         NULL,                // NoEmpl
         'Administrateur',
         'Admin',
         '',
         '',
-        '',  
+        '',
         NULL                   // Modification (NULL par défaut)
     );
+
 }
 
 // Déconnexion
 $mysql->deconnexion();
+
 ?>

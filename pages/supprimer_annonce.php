@@ -1,8 +1,8 @@
 <?php
 session_start();
-include '../outils/DBConnexion.php'; // Adjust the path if needed
+include '../outils/DBConnexion.php'; 
 
-// Create MySQL connection object
+
 try {
     $mysql = new MySQL('projet2', str_replace(".", "-", $_SERVER["SERVER_NAME"]) . ".php");
     $mysql->connexion();
@@ -11,14 +11,14 @@ try {
     die("Erreur de connexion à la base de données : " . $e->getMessage());
 }
 
-// Check if NoAnnonce is set in the URL
+
 if (!isset($_GET['NoAnnonce'])) {
     die("Numéro d'annonce manquant.");
 }
 
 $noAnnonce = $_GET['NoAnnonce'];
 
-// Fetch ad details
+
 $query = "SELECT a.*, u.Nom, u.Prenom, u.NoTelTravail FROM annonces a 
           JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur 
           WHERE a.NoAnnonce = ?";
@@ -32,7 +32,7 @@ if (!$annonce) {
     die("Annonce introuvable.");
 }
 
-// Handle deletion if confirmed
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['confirm']) && $_POST['confirm'] === 'oui') {
     $deleteQuery = "DELETE FROM annonces WHERE NoAnnonce = ?";
     $deleteStmt = $mysql->cBD->prepare($deleteQuery);

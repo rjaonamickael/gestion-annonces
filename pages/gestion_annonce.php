@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../outils/DBConnexion.php'; // Adjust the path if needed
+include '../outils/DBConnexion.php'; 
 
 // Create MySQL connection object
 try {
@@ -11,9 +11,9 @@ try {
     die("Erreur de connexion à la base de données : " . $e->getMessage());
 }
 
-$noUtilisateur = 1; // Temporary user number for testing
+$noUtilisateur = 1; 
 
-// Handle ad addition
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $categorie = $_POST['categorie'];
     $descriptionAbregee = $_POST['description_abregee'];
@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $prix = $_POST['prix'] ?? 0; // Default price to 0 if not set
     $photo = $_FILES['photo']['name'] ?? '';
 
-    // Upload photo if provided
+   
     if ($photo) {
         $targetDir = "../photos/"; // Ensure the directory exists and is writable
         $targetFile = $targetDir . basename($photo);
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    // Insert the ad into the database
+
     $query = "INSERT INTO annonces (NoUtilisateur, Parution, Categorie, DescriptionAbregee, DescriptionComplete, Prix, Photo, Etat) 
               VALUES (?, NOW(), ?, ?, ?, ?, ?, 1)";
     $stmt = $mysql->cBD->prepare($query);
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $mysql->deconnexion();
 }
 
-// Fetch ads for display
+
 $query = "SELECT a.NoAnnonce, a.Parution, a.Categorie, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat 
           FROM annonces a 
           WHERE a.Etat = 1 

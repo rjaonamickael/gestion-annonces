@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../outils/DBConnexion.php'; // Adjust the path if needed
+include '../outils/DBConnexion.php'; 
 
 // Create MySQL connection object
 try {
@@ -11,14 +11,14 @@ try {
     die("Erreur de connexion à la base de données : " . $e->getMessage());
 }
 
-// Check if NoAnnonce is set in the URL
+
 if (!isset($_GET['NoAnnonce'])) {
     die("Numéro d'annonce manquant.");
 }
 
 $noAnnonce = $_GET['NoAnnonce'];
 
-// Fetch the ad details to populate the form
+
 $query = "SELECT * FROM annonces WHERE NoAnnonce = ?";
 $stmt = $mysql->cBD->prepare($query);
 $stmt->bind_param('i', $noAnnonce);
@@ -30,15 +30,14 @@ if (!$annonce) {
     die("Annonce introuvable.");
 }
 
-// Handle form submission for updating the ad
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $categorie = $_POST['categorie'];
     $descriptionAbregee = $_POST['description_abregee'];
     $descriptionComplete = $_POST['description_complete'];
     $prix = $_POST['prix'] ?? 0;
-    $photo = $_FILES['photo']['name'] ?? $annonce['Photo']; // Keep the existing photo if none is uploaded
+    $photo = $_FILES['photo']['name'] ?? $annonce['Photo']; 
 
-    // Handle photo upload if a new photo is provided
     if (!empty($_FILES['photo']['name'])) {
         $targetDir = "../photos/";
         $targetFile = $targetDir . basename($photo);
@@ -48,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    // Update the ad in the database
+   
     $updateQuery = "UPDATE annonces SET Categorie = ?, DescriptionAbregee = ?, DescriptionComplete = ?, Prix = ?, Photo = ?, MiseAJour = NOW() WHERE NoAnnonce = ?";
     $updateStmt = $mysql->cBD->prepare($updateQuery);
     $updateStmt->bind_param('sssdsi', $categorie, $descriptionAbregee, $descriptionComplete, $prix, $photo, $noAnnonce);
