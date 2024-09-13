@@ -72,7 +72,7 @@
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         include('./outils/DBConnexion.php');
         require './configurations/security.config.php';
-        require './functions/connexionFunctions.php';
+        
 
         // Récupérer les données du formulaire
         $email = $_POST['tbEmail'];
