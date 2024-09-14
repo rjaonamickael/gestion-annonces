@@ -124,8 +124,8 @@ if ($result === false) {
                     <?php while ($row = $result->fetch_assoc()): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($row['NoAnnonce']); ?></td>
-                        <td><img src="../photos/<?php echo htmlspecialchars($row['Photo']); ?>"
-                                alt="Image de l'annonce"></td>
+                        <td><img src="./photos/<?php echo htmlspecialchars($row['Photo']); ?>" alt="Image de l'annonce">
+                        </td>
                         <td><a href="#"><?php echo htmlspecialchars($row['DescriptionAbregee']); ?></a></td>
                         <td><?php echo htmlspecialchars($row['Categorie']); ?></td>
                         <td><?php echo $row['Prix'] !== null ? number_format($row['Prix'], 2, ',', ' ') . " $" : 'N/A'; ?>

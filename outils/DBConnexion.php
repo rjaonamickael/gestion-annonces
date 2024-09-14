@@ -37,8 +37,8 @@ class MySQL
 {
     // Liste des colonnes dans le bon ordre
     $colonnes = [
-        'Courriel', 'MotDePasse', 'Creation', 'Modification', 'NbConnexions', 'NoEmpl', 
-        'Nom', 'Prenom', 'Sel', 'Statut', 'NoTelCellulaire', 'NoTelMaison', 'NoTelTravail'
+        'NoUtilisateur', 'Courriel', 'MotDePasse', 'Creation', 'NbConnexions', 'Statut', 
+        'NoEmpl', 'Nom', 'Prenom', 'NoTelMaison', 'NoTelTravail', 'NoTelCellulaire', 'Modification'
     ]; 
 
     $values = [];
