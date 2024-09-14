@@ -63,7 +63,47 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         font-size: 16px;
     }
     </style>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('formInscription');
+        const passwordInput = document.getElementById('tbMDP');
+        const passwordConfirmInput = document.getElementById('tbMDPConfirmation');
+        const passwordError = document.getElementById('errMdpConfirm');
+        const urlParams = new URLSearchParams(window.location.search);
+
+        form.addEventListener('submit', function(event) {
+            let valid = true;
+
+            // Réinitialiser les messages d'erreur
+            passwordError.textContent = '';
+
+            // Vérification des mots de passe
+            if (passwordInput.value !== passwordConfirmInput.value) {
+                passwordError.textContent = 'Les mots de passe ne correspondent pas.';
+                valid = false;
+            } else {
+                // Validation de la longueur et du contenu du mot de passe
+                const password = passwordInput.value;
+                const passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{5,15}$/;
+
+                if (!passwordPattern.test(password)) {
+                    passwordError.textContent =
+                        'Le mot de passe doit contenir entre 5 et 15 caractères, incluant que des lettres et des chiffres.';
+                    valid = false;
+                }
+            }
+
+            if (!valid) {
+                // Empêcher l'envoi du formulaire si les validations échouent
+                event.preventDefault();
+            }
+        });
+    });
+    </script>
 </head>
+
+
 
 <body>
     <!-- Popup Notification -->
