@@ -2,7 +2,6 @@
 session_start();
 include '../outils/DBConnexion.php'; 
 
-// Create MySQL connection object
 try {
     $mysql = new MySQL('projet2', str_replace(".", "-", $_SERVER["SERVER_NAME"]) . ".php");
     $mysql->connexion();
@@ -54,12 +53,12 @@ if ($result === false) {
         <h1 class="text-center my-3">Annonces</h1>
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item"><a href="gestion_annonce.php" class="nav-link">Annonces</a></li>
-                <li class="nav-item"><a href="afficher_annonces.php" class="nav-link">Gestion de vos annonces</a></li>
+                <li class="nav-item"><a href="afficher_annonces.php" class="nav-link">Annonces</a></li>
+                <li class="nav-item"><a href="gestion_annonce.php" class="nav-link">Gestion de vos annonces</a></li>
                 <li class="nav-item"><a href="modification_profil.php" class="nav-link">Modification du profil</a></li>
                 <li class="nav-item"><a href="../index.php" class="nav-link">Déconnexion (test@test.test)</a></li>
             </ul>
-            <!-- Bouton "Ajouter" redirige vers AjoutAnnonce.php -->
+           
             <a href="AjoutAnnonce.php" class="btn btn-primary">Ajouter</a>
         </nav>
     </header>
@@ -84,8 +83,7 @@ if ($result === false) {
                     <?php while ($row = $result->fetch_assoc()): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($row['NoAnnonce']); ?></td>
-                        <td><img src="./photos/<?php echo htmlspecialchars($row['Photo']); ?>" alt="Image de l'annonce">
-                        </td>
+                        <td><img src="../photos/<?php echo htmlspecialchars($row['Photo']); ?>" alt="Image de l'annonce"></td>
                         <td><a href="#"><?php echo htmlspecialchars($row['DescriptionAbregee']); ?></a></td>
                         <td><?php echo htmlspecialchars($row['Categorie']); ?></td>
                         <td><?php echo $row['Prix'] !== null ? number_format($row['Prix'], 2, ',', ' ') . " $" : 'N/A'; ?></td>

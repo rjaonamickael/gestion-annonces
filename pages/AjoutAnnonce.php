@@ -2,7 +2,7 @@
 session_start();
 include '../outils/DBConnexion.php'; 
 
-// Create MySQL connection object
+
 try {
     $mysql = new MySQL('projet2', str_replace(".", "-", $_SERVER["SERVER_NAME"]) . ".php");
     $mysql->connexion();
@@ -17,11 +17,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $categorie = $_POST['categorie'];
     $descriptionAbregee = $_POST['description_abregee'];
     $descriptionComplete = $_POST['description_complete'];
-    $prix = $_POST['prix'] ?? 0; // Default price to 0 if not set
+    $prix = $_POST['prix'] ?? 0; 
     $photo = $_FILES['photo']['name'] ?? '';
 
     if ($photo) {
-        $targetDir = "../photos/"; // Ensure the directory exists and is writable
+        $targetDir = "../photos/";
         $targetFile = $targetDir . basename($photo);
         if (!move_uploaded_file($_FILES['photo']['tmp_name'], $targetFile)) {
             echo "Erreur lors du téléchargement de la photo.";

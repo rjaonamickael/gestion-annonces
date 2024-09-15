@@ -2,7 +2,7 @@
 session_start();
 include '../outils/DBConnexion.php'; 
 
-// Create MySQL connection object
+// Connexion à la base de données
 try {
     $mysql = new MySQL('projet2', str_replace(".", "-", $_SERVER["SERVER_NAME"]) . ".php");
     $mysql->connexion();
@@ -13,6 +13,7 @@ try {
 
 $noUtilisateur = 1; 
 
+// Gestion de la pagination et du tri
 $itemsPerPage = isset($_GET['itemsPerPage']) ? (int)$_GET['itemsPerPage'] : 5; 
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $itemsPerPage;
@@ -23,37 +24,37 @@ $orderDir = isset($_GET['orderDir']) && $_GET['orderDir'] === 'asc' ? 'ASC' : 'D
 $searchQuery = " WHERE a.Etat = 1 ";
 $searchParams = [];
 
-// Filter by author
+// Gestion des filtres de recherche
 if (!empty($_GET['author'])) {
     $searchQuery .= " AND (u.Nom LIKE ? OR u.Prenom LIKE ?) ";
     $searchParams[] = '%' . $_GET['author'] . '%';
     $searchParams[] = '%' . $_GET['author'] . '%';
 }
 
-// Filter by category (expecting the category ID from the dropdown)
 if (!empty($_GET['category'])) {
     $searchQuery .= " AND a.Categorie = ? ";
     $searchParams[] = $_GET['category'];
 }
 
-// Filter by date range
 if (!empty($_GET['startDate']) && !empty($_GET['endDate'])) {
     $searchQuery .= " AND a.Parution BETWEEN ? AND ? ";
     $searchParams[] = $_GET['startDate'] . ' 00:00:00';
     $searchParams[] = $_GET['endDate'] . ' 23:59:59';
 }
 
-// Filter by description
 if (!empty($_GET['description'])) {
     $searchQuery .= " AND a.DescriptionAbregee LIKE ? ";
     $searchParams[] = '%' . $_GET['description'] . '%';
 }
 
-// Total count query with filters applied
+// Requête pour compter le nombre total d'annonces
 $totalQuery = "SELECT COUNT(*) as total FROM annonces a 
                JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur
                $searchQuery";
 $totalStmt = $mysql->cBD->prepare($totalQuery);
+if ($totalStmt === false) {
+    die("Erreur lors de la préparation de la requête de comptage : " . $mysql->cBD->error);
+}
 if (!empty($searchParams)) {
     $types = str_repeat('s', count($searchParams));
     $totalStmt->bind_param($types, ...$searchParams);
@@ -63,7 +64,7 @@ $totalResult = $totalStmt->get_result();
 $totalAds = $totalResult->fetch_assoc()['total'];
 $totalPages = ceil($totalAds / $itemsPerPage);
 
-// Main query with filters and pagination
+// Requête  pour récupérer les annonces avec les filtres 
 $query = "SELECT a.NoAnnonce, a.Parution, c.Description as Categorie, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, u.NoUtilisateur
           FROM annonces a 
           JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur
@@ -75,6 +76,9 @@ $searchParams[] = $itemsPerPage;
 $searchParams[] = $offset;
 
 $stmt = $mysql->cBD->prepare($query);
+if ($stmt === false) {
+    die("Erreur lors de la préparation de la requête principale : " . $mysql->cBD->error);
+}
 if (!empty($searchParams)) {
     $types = str_repeat('s', count($searchParams) - 2) . 'ii'; 
     $stmt->bind_param($types, ...$searchParams);
@@ -83,7 +87,7 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result === false) {
-    die("Erreur lors de l'exécution de la requête : " . $mysql->cBD->error);
+    die("Erreur lors de l'exécution de la requête principale : " . $stmt->error);
 }
 ?>
 
@@ -98,6 +102,8 @@ if ($result === false) {
     <style>
         body { background-color: #f8f9fa; }
         .container { margin-top: 20px; }
+        .card { width: 100%; margin-bottom: 20px; }
+        .card img { width: 100%; height: 200px; object-fit: cover; }
         .grid-container {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -158,9 +164,21 @@ if ($result === false) {
         <div> 
             <strong><?php echo $totalAds; ?> annonces trouvées.</strong>
         </div>
+        <div class="d-flex align-items-center">
+            <label for="orderBy" class="mr-2">Ordre :</label>
+            <select id="orderBy" class="mr-2" onchange="window.location.href='?orderBy=' + this.value + '&orderDir=' + document.getElementById('orderDir').value">
+                <option value="Parution" <?php echo $orderBy == 'Parution' ? 'selected' : ''; ?>>Date</option>
+                <option value="Nom" <?php echo $orderBy == 'Nom' ? 'selected' : ''; ?>>Auteur</option>
+                <option value="Categorie" <?php echo $orderBy == 'Categorie' ? 'selected' : ''; ?>>Catégorie</option>
+            </select>
+            <select id="orderDir" class="mr-2" onchange="window.location.href='?orderBy=' + document.getElementById('orderBy').value + '&orderDir=' + this.value">
+                <option value="asc" <?php echo $orderDir == 'ASC' ? 'selected' : ''; ?>>▲</option>
+                <option value="desc" <?php echo $orderDir == 'DESC' ? 'selected' : ''; ?>>▼</option>
+            </select>
+        </div>
     </div>
 
-    <!-- Advanced Search Form -->
+    <!-- Formulaire de recherche  -->
     <div class="advanced-search">
         <form method="get" action="afficher_annonces.php">
             <div class="form-row">
@@ -192,6 +210,7 @@ if ($result === false) {
         </form>
     </div>
 
+    <!-- Affichage des annonces sous forme de cartes -->
     <div class="grid-container">
         <?php if ($result && $result->num_rows > 0): ?>
             <?php while ($row = $result->fetch_assoc()): ?>
@@ -199,7 +218,7 @@ if ($result === false) {
                     <img src="../photos/<?php echo htmlspecialchars($row['Photo']); ?>" class="card-img-top" alt="Image de l'annonce">
                     <div class="card-body">
                         <h5 class="card-title">#<?php echo htmlspecialchars($row['NoAnnonce']); ?> - <?php echo htmlspecialchars($row['Categorie']); ?></h5>
-                        <p class="card-text"><a href="#"><?php echo htmlspecialchars($row['DescriptionAbregee']); ?></a></p>
+                        <p class="card-text"><a href="afficher_annonce.php?NoAnnonce=<?php echo htmlspecialchars($row['NoAnnonce']); ?>"><?php echo htmlspecialchars($row['DescriptionAbregee']); ?></a></p>
                         <p><?php echo htmlspecialchars($row['Nom']) . ', ' . htmlspecialchars($row['Prenom']); ?></p>
                         <p><?php echo number_format($row['Prix'], 2, ',', ' ') . " $"; ?></p>
                         <p><?php echo date('Y-m-d H:i:s', strtotime($row['Parution'])); ?></p>
@@ -211,7 +230,7 @@ if ($result === false) {
         <?php endif; ?>
     </div>
 
-    <!-- Pagination controls -->
+    <!-- Contrôles de pagination -->
     <div class="d-flex justify-content-center mt-4">
         <nav aria-label="Page navigation">
             <ul class="pagination">
