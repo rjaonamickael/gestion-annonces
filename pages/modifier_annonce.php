@@ -11,14 +11,14 @@ try {
     die("Erreur de connexion à la base de données : " . $e->getMessage());
 }
 
-
+// Check if NoAnnonce is set
 if (!isset($_GET['NoAnnonce'])) {
     die("Numéro d'annonce manquant.");
 }
 
-$noAnnonce = $_GET['NoAnnonce'];
+$noAnnonce = (int)$_GET['NoAnnonce'];
 
-
+// Fetch the announcement data
 $query = "SELECT * FROM annonces WHERE NoAnnonce = ?";
 $stmt = $mysql->cBD->prepare($query);
 $stmt->bind_param('i', $noAnnonce);
@@ -30,15 +30,18 @@ if (!$annonce) {
     die("Annonce introuvable.");
 }
 
-
+// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $categorie = $_POST['categorie'];
     $descriptionAbregee = $_POST['description_abregee'];
     $descriptionComplete = $_POST['description_complete'];
     $prix = $_POST['prix'] ?? 0;
-    $photo = $_FILES['photo']['name'] ?? $annonce['Photo']; 
+    $etat = $_POST['etat'];
+    $photo = $annonce['Photo']; // Keep existing photo as default
 
+    // Check if a new photo is uploaded
     if (!empty($_FILES['photo']['name'])) {
+        $photo = $_FILES['photo']['name'];
         $targetDir = "../photos/";
         $targetFile = $targetDir . basename($photo);
         if (!move_uploaded_file($_FILES['photo']['tmp_name'], $targetFile)) {
@@ -47,10 +50,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-   
-    $updateQuery = "UPDATE annonces SET Categorie = ?, DescriptionAbregee = ?, DescriptionComplete = ?, Prix = ?, Photo = ?, MiseAJour = NOW() WHERE NoAnnonce = ?";
+    // Update the announcement data
+    $updateQuery = "UPDATE annonces SET Categorie = ?, DescriptionAbregee = ?, DescriptionComplete = ?, Prix = ?, Photo = ?, Etat = ?, MiseAJour = NOW() WHERE NoAnnonce = ?";
     $updateStmt = $mysql->cBD->prepare($updateQuery);
-    $updateStmt->bind_param('sssdsi', $categorie, $descriptionAbregee, $descriptionComplete, $prix, $photo, $noAnnonce);
+    $updateStmt->bind_param('sssdsii', $categorie, $descriptionAbregee, $descriptionComplete, $prix, $photo, $etat, $noAnnonce);
 
     if ($updateStmt->execute()) {
         header("Location: gestion_annonce.php");
@@ -82,12 +85,12 @@ $mysql->deconnexion();
         <div class="form-group">
             <label for="categorie">Catégorie :</label>
             <select name="categorie" id="categorie" class="form-control" required>
-                <option value="Location" <?php echo $annonce['Categorie'] == 'Location' ? 'selected' : ''; ?>>Location</option>
-                <option value="Recherche" <?php echo $annonce['Categorie'] == 'Recherche' ? 'selected' : ''; ?>>Recherche</option>
-                <option value="À vendre" <?php echo $annonce['Categorie'] == 'À vendre' ? 'selected' : ''; ?>>À vendre</option>
-                <option value="À donner" <?php echo $annonce['Categorie'] == 'À donner' ? 'selected' : ''; ?>>À donner</option>
-                <option value="Service offert" <?php echo $annonce['Categorie'] == 'Service offert' ? 'selected' : ''; ?>>Service offert</option>
-                <option value="Autre" <?php echo $annonce['Categorie'] == 'Autre' ? 'selected' : ''; ?>>Autre</option>
+                <option value="1" <?php echo $annonce['Categorie'] == 1 ? 'selected' : ''; ?>>Location</option>
+                <option value="2" <?php echo $annonce['Categorie'] == 2 ? 'selected' : ''; ?>>Recherche</option>
+                <option value="3" <?php echo $annonce['Categorie'] == 3 ? 'selected' : ''; ?>>À vendre</option>
+                <option value="4" <?php echo $annonce['Categorie'] == 4 ? 'selected' : ''; ?>>À donner</option>
+                <option value="5" <?php echo $annonce['Categorie'] == 5 ? 'selected' : ''; ?>>Service offert</option>
+                <option value="6" <?php echo $annonce['Categorie'] == 6 ? 'selected' : ''; ?>>Autre</option>
             </select>
         </div>
         <div class="form-group">
@@ -103,8 +106,11 @@ $mysql->deconnexion();
             <input type="number" name="prix" id="prix" step="0.01" class="form-control" value="<?php echo htmlspecialchars($annonce['Prix']); ?>">
         </div>
         <div class="form-group">
-            <label for="photo">Select l'image de l'annonce :</label>
+            <label for="photo">Sélectionner l'image de l'annonce :</label>
             <input type="file" name="photo" id="photo" class="form-control">
+            <?php if ($annonce['Photo']): ?>
+                <img src="../photos/<?php echo htmlspecialchars($annonce['Photo']); ?>" alt="Image actuelle" style="max-width: 150px; margin-top: 10px;">
+            <?php endif; ?>
         </div>
         <div class="form-group">
             <label for="etat">Actif ?</label>
