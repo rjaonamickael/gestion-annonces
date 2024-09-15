@@ -4,6 +4,9 @@ require '../configurations/security.config.php';
 include('../composants/header.php');
 include '../outils/DBConnexion.php';
 
+// Définir le type de hashage
+define('HASH_TYPE', 'sha256');
+
 echo scriptVerification();
 ?>
 <title>FAF - inscription</title>
@@ -47,7 +50,6 @@ echo scriptVerification();
             </div>
             <div>
                 <input type="submit" value="S&#39;inscrire" class="btn btn-primary col-md-12" id="btnInscription">
-
             </div>
             <br>
             <div>
@@ -58,7 +60,6 @@ echo scriptVerification();
     </div>
 
     <?php
-
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Recevoir les valeurs du formulaire   
         $email = $_POST['tbinscriptionEmail'];
@@ -127,3 +128,5 @@ echo scriptVerification();
     ?>
 
     <?php include('../composants/footer.php'); ?>
+</body>
+</html>
