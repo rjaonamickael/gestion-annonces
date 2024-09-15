@@ -5,7 +5,7 @@ include('../composants/header.php');
 include '../outils/DBConnexion.php';
 
 // Définir le type de hashage
-define('HASH_TYPE', 'sha256');
+
 
 echo scriptVerification();
 ?>
@@ -129,4 +129,5 @@ echo scriptVerification();
 
     <?php include('../composants/footer.php'); ?>
 </body>
+
 </html>
