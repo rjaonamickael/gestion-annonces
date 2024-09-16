@@ -123,6 +123,12 @@
 
                 // Déconnexion
                 $mysql->deconnexion();
+                
+                if (empty($row['Nom']) || empty($row['Prenom'])) {
+                    header("Location: ../pages/modification-profil.php");
+                    exit();
+                }
+
                 header("Location: ../pages/gestion_annonce.php");
                 exit();
             } else {

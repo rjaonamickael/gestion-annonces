@@ -68,8 +68,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $lastName = $row['Nom'] ?? '';
             $firstName = $row['Prenom'] ?? '';
             $homePhone = $row['NoTelMaison'] ?? '';
-            $workPhone = strtok($row['NoTelTravail'], ' ') ?? '';
-            $workExtension = str_replace($workPhone . ' ', '', $row['NoTelTravail']) ?? '';
+            $workPhone = strtok($row['NoTelTravail'], '#') ?? '';
+            $workExtension = str_replace($workPhone . '#', '', $row['NoTelTravail']) ?? '';
             $cellPhone = $row['NoTelCellulaire'] ?? '';
         }
     }
@@ -167,7 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
             <button type="submit" class="btn btn-primary btn-block">Enregistrer</button>
         </form>
-        <a href="annonces.html" class="d-block text-center mt-3">Retour à la liste des annonces</a>
+        <a href="gestion_annonce.php" class="d-block text-center mt-3">Retour à la liste des annonces</a>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

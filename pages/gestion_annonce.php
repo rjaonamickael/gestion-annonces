@@ -55,7 +55,7 @@ if ($result === false) {
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item"><a href="afficher_annonces.php" class="nav-link">Annonces</a></li>
                 <li class="nav-item"><a href="gestion_annonce.php" class="nav-link">Gestion de vos annonces</a></li>
-                <li class="nav-item"><a href="modification_profil.php" class="nav-link">Modification du profil</a></li>
+                <li class="nav-item"><a href="modification-profil.php" class="nav-link">Modification du profil</a></li>
                 <li class="nav-item"><a href="../index.php" class="nav-link">Déconnexion (test@test.test)</a></li>
             </ul>
            
