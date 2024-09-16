@@ -2,7 +2,7 @@
 
 session_start();
 
-include('../outils/DBConnexion.php');
+include ('../outils/DBConnexion.php');
 
 // Initialisation de la connexion à la base de données
 $strNomBD = "projet2";
@@ -17,7 +17,7 @@ $mysql->selectionneBD();
 $status = $employeeNumber = $lastName = $firstName = $homePhone = $workPhone = $workExtension = $cellPhone = '';
 
 // Recuperation de l'email
-$email = !empty($_SESSION['Courriel']) ? $_SESSION['Courriel'] : "";
+$email = isset($_SESSION['Courriel']) ? $_SESSION['Courriel'] : "";
 
 // Vérifier si le formulaire est soumis
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Déconnexion
     $mysql->deconnexion();
 } else {
-    if (!empty($email)) {
+    if(!empty($email)){
         $querySelectUser = "SELECT * FROM utilisateurs WHERE Courriel = '$email'";
         $result = $mysql->cBD->query($querySelectUser);
         if ($result && $row = $result->fetch_assoc()) {
@@ -133,14 +133,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <label for="status">Statut</label>
                 <select id="status" class="form-control" name="status">
                     <option value="">Choisir un statut...</option>
-                    <option value="4" <?php if ($status == '4')
-                        echo 'selected'; ?>>Enseignant</option>
-                    <option value="2" <?php if ($status == '2')
-                        echo 'selected'; ?>>Cadre</option>
-                    <option value="3" <?php if ($status == '3')
-                        echo 'selected'; ?>>Employé de soutien</option>
-                    <option value="5" <?php if ($status == '5')
-                        echo 'selected'; ?>>Professionnel</option>
+                    <option value="4" <?php if ($status == '4') echo 'selected'; ?>>Enseignant</option>
+                    <option value="2" <?php if ($status == '2') echo 'selected'; ?>>Cadre</option>
+                    <option value="3" <?php if ($status == '3') echo 'selected'; ?>>Employé de soutien</option>
+                    <option value="5" <?php if ($status == '5') echo 'selected'; ?>>Professionnel</option>
                 </select>
             </div>
             <div class="form-group">
@@ -173,12 +169,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="d-flex align-items-center">
                     <input type="tel" class="form-control" id="workPhone" name="workPhone" placeholder="(111) 111-1112"
                         value="<?php echo htmlspecialchars($workPhone); ?>">
-
                     <input type="text" class="form-control ml-2" id="workExtension" name="workExtension"
                         placeholder="Poste" value="<?php echo htmlspecialchars($workExtension); ?>">
                 </div>
             </div>
-
             <div class="form-group">
                 <label for="cellPhone">Numéro Téléphone Cellulaire</label>
                 <div class="d-flex align-items-center">
@@ -187,11 +181,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
             </div>
             <button type="submit" class="btn btn-primary btn-block">Enregistrer</button>
-
         </form>
-        <a href="gestion_annonce.php" class="d-block text-center mt-3">Retour à la liste des annonces</a>
+        <a href="afficher_annonces.php" class="d-block text-center mt-3">Retour à la liste des annonces</a>
     </div>
-
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>

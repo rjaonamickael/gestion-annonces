@@ -6,19 +6,41 @@ try {
     $mysql = new MySQL('projet2', str_replace(".", "-", $_SERVER["SERVER_NAME"]) . ".php");
     $mysql->connexion();
     $mysql->selectionneBD();
+    
 } catch (Exception $e) {
+    
     die("Erreur de connexion à la base de données : " . $e->getMessage());
+    
 }
 
-$noUtilisateur = 1; 
+$email = isset($_SESSION['Courriel']) ? $_SESSION['Courriel'] : "";
+
+$query = "SELECT * FROM utilisateurs WHERE Courriel = ?";
+$stmt = $mysql->cBD->prepare($query);
+$stmt->bind_param("s", $email);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+
+$noUtilisateur = $row['NoUtilisateur'];
+
+if($row['Statut'] == 1){
+    $searchQuery = " ";
+}
+else{
+    $searchQuery = " WHERE u.NoUtilisateur = ".$noUtilisateur." ";
+}
 
 $query = "SELECT a.NoAnnonce, a.Parution, c.Description as Categorie, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat 
           FROM annonces a 
-          JOIN categories c ON a.Categorie = c.NoCategorie
+          JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur
+          JOIN categories c ON a.Categorie = c.NoCategorie 
+          $searchQuery
           ORDER BY a.Parution DESC 
           LIMIT 10";
+          
 $result = $mysql->cBD->query($query);
-
+//echo $result->num_rows ;
 if ($result === false) {
     die("Erreur lors de l'exécution de la requête : " . $mysql->cBD->error);
 }
@@ -61,7 +83,8 @@ if ($result === false) {
                 <li class="nav-item"><a href="afficher_annonces.php" class="nav-link">Annonces</a></li>
                 <li class="nav-item"><a href="gestion_annonce.php" class="nav-link">Gestion de vos annonces</a></li>
                 <li class="nav-item"><a href="modification-profil.php" class="nav-link">Modification du profil</a></li>
-                <li class="nav-item"><a href="../index.php" class="nav-link">Déconnexion (test@test.test)</a></li>
+                <li class="nav-item"><a href="../index.php" class="nav-link">Déconnexion (<?php echo $email; ?>)</a>
+                </li>
             </ul>
 
             <a href="AjoutAnnonce.php" class="btn btn-primary">Ajouter</a>
@@ -84,12 +107,13 @@ if ($result === false) {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if ($result && $result->num_rows > 0): ?>
+                    <?php if ($result->num_rows > 0): ?>
                     <?php while ($row = $result->fetch_assoc()): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($row['NoAnnonce']); ?></td>
                         <td><img src="../photos/<?php echo htmlspecialchars($row['Photo']); ?>"
-                                alt="Image de l'annonce"></td>
+                                alt="Image de l'annonce">
+                        </td>
                         <td><a href="#"><?php echo htmlspecialchars($row['DescriptionAbregee']); ?></a></td>
                         <td><?php echo htmlspecialchars($row['Categorie']); ?></td>
                         <td><?php echo $row['Prix'] !== null ? number_format($row['Prix'], 2, ',', ' ') . " $" : 'N/A'; ?>

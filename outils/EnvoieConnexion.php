@@ -44,17 +44,8 @@ if ($result->num_rows === 0) {
         $stmtInsert->bind_param("i", $userId);
         $stmtInsert->execute();
 
-        // Sauvegarde de l'email dans le session storage
-        $_SESSION['Courriel'] = $email;
-
         // Déconnexion
         $mysql->deconnexion();
-
-        if (empty($row['Nom']) || empty($row['Prenom'])) {
-            header("Location: ../pages/modification-profil.php");
-            exit();
-        }
-
         header("Location: ../pages/gestion_annonce.php");
         exit();
     } else {

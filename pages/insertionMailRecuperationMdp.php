@@ -1,11 +1,13 @@
-<title>FAF - Connexion</title>
+<?php include('../composants/header.php'); ?>
+
+<title>FAF - Mot de passe oublié </title>
 </head>
 
 <body>
 
     <div class="container-fluid my-4">
         <div id="divConnexion" class="col-4 m-auto">
-            <h1 class="text-center" id="titreConnexion">Connexion</h1>
+            <h1 class="text-center" id="titreConnexion" style="margin-bottom: 50px;">Mot de passe oublié </h1>
             <form id="formConnexion" action="" method="POST" autocomplete="off">
 
                 <div class="form-group">
@@ -19,36 +21,20 @@
                         if (isset($_SESSION['errors']) && in_array("Identifiant inexistant.", $_SESSION['errors'])) {
                             echo "Adresse email inexistant.";
                             unset($_SESSION['errors']); // Effacez les erreurs après les avoir affichées
-                        }else if(isset($_SESSION['errors']) && in_array("Adresse email non confirmée.", $_SESSION['errors'])){
+                        } else if (isset($_SESSION['errors']) && in_array("Adresse email non confirmée.", $_SESSION['errors'])) {
                             echo "Adresse email pas encore confirmée. Consultez votre boîte mail.";
                             unset($_SESSION['errors']);
                         }
                         ?>
                     </p>
                 </div>
-
-                <div class="form-group">
-                    <label for="tbMdp">Mot de passe</label>
-                    <input type="password" class="form-control" id="tbMdp" name="tbMdp" placeholder="Mot de passe"
-                        autocomplete="off">
-                    <p id="errMdp" class="text-danger font-weight-bold">
-                        <?php
-                        
-                        if (isset($_SESSION['errors']) && in_array("Mot de passe incorrect.", $_SESSION['errors'])) {
-                            echo "Mot de passe incorrect.";
-                            unset($_SESSION['errors']);
-                        }
-                        ?>
-                    </p>
-                </div>
-
-                <div class="my-1 text-right">
-                    <a href="./pages/inscription.php">Créer un compte</a> |
-                    <a href="./pages/insertionMailRecuperationMdp.php">Mot de passe oublié</a>
+                <div>
+                    <!-- Faire la redirection vers la page de connection -->
+                    <p><a href="../">Connectez vous ici</a>.</p>
                 </div>
 
                 <div class="d-flex">
-                    <button type="submit" class="btn btn-primary" id="btnConnecter">Connexion</button>
+                    <button type="submit" class="btn btn-primary" id="btnConnecter">Valider</button>
                 </div>
             </form>
 
@@ -58,9 +44,6 @@
                 const emailValue =
                     "<?php echo isset($_SESSION['form_data']['email']) ? $_SESSION['form_data']['email'] : ''; ?>";
                 emailField.value = emailValue;
-
-                const passwordField = document.getElementById('tbMdp');
-                passwordField.value = ""; // Toujours effacer le mot de passe pour la sécurité
             };
             </script>
         </div>
@@ -70,13 +53,13 @@
 
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        include('./outils/DBConnexion.php');
-        require './configurations/security.config.php';
-        
+        include('../outils/DBConnexion.php');
+        require '../configurations/security.config.php';
+        require '../functions/connexionFunctions.php';
+
 
         // Récupérer les données du formulaire
         $email = $_POST['tbEmail'];
-        $password = $_POST['tbMdp'];
 
         // Connexion à la base de données
         $strNomBD = "projet2";
@@ -99,48 +82,38 @@
             $_SESSION['errors'] = ["Identifiant inexistant."];
         } else {
             $row = $result->fetch_assoc();
-            $userId = $row['NoUtilisateur'];
-            
-            // Recréer le hash avec le mot de passe fourni et le salt récupéré
-            $passwordHashed = hash(HASH_TYPE, $password);
 
-            if($row['Statut'] == 0){
-                $_SESSION['errors'] = ["Adresse email non confirmée."];            
+            if ($row['Statut'] == 0) {
+                $_SESSION['errors'] = ["Adresse email non confirmée."];
             }
             // Vérifier le mot de passe
-            else if ($passwordHashed === $row['MotDePasse']) {
-                // Connexion réussie
-                $queryUpdateUtilisateur = "UPDATE utilisateurs SET NbConnexions = NbConnexions + 1 WHERE NoUtilisateur = ?";
-                $stmtUpdate = $mysql->cBD->prepare($queryUpdateUtilisateur);
-                $stmtUpdate->bind_param("i", $userId);
-                $stmtUpdate->execute();
+            else {
 
-                // Insérer une ligne dans la table connexions
-                $queryInsertConnexion = "INSERT INTO connexions (NoUtilisateur, Connexion) VALUES (?, NOW())";
-                $stmtInsert = $mysql->cBD->prepare($queryInsertConnexion);
-                $stmtInsert->bind_param("i", $userId);
-                $stmtInsert->execute();
+                // Préparer l'email de confirmation
+                $dest = $email;
+                $objet = "Récupération de mot de passe";
 
-                // Déconnexion
-                $mysql->deconnexion();
+                $message = messageRcuperationMdp($email);
 
-                $_SESSION['Courriel'] = $email;
-
-                
-                header("Location: ../pages/afficher_annonces.php");
+                // Envoi de l'email
+                sendEmail($dest, $objet, $message);
                 exit();
-            } else {
-                $_SESSION['errors'] = ["Mot de passe incorrect."];
             }
         }
 
         $mysql->deconnexion();
 
+        // Stocker les données du formulaire dans la session
+        $_SESSION['form_data'] = [
+            'email' => $email
+        ];
 
-        
+        // Rediriger pour recharger la page et afficher les erreurs
         header("Location: " . $_SERVER['PHP_SELF']);
         exit();
     }
     ?>
 
     <br>
+
+    <?php include('../composants/footer.php'); ?>
