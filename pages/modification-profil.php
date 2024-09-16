@@ -119,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
             <div class="form-group">
                 <label for="password">Nouveau mot de passe</label>
-                <a href="change-password.html" class="d-block mb-2">Accédez à la modification de mot de passe ici</a>
+                <a href="../pages/recuperationMdp.php" class="d-block mb-2">Accédez à la modification de mot de passe ici</a>
             </div>
             <div class="form-group">
                 <label for="status">Statut</label>
