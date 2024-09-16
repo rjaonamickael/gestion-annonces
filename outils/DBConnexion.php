@@ -70,5 +70,39 @@ class MySQL
     }
 }
 
+function insereCategorie($strNomTable, ...$args)
+{
+    // Liste des colonnes dans le bon ordre
+    $colonnes = ['NoCategorie', 'Description']; 
+
+    $values = [];
+
+    foreach ($args as $value) {
+        if (is_bool($value)) {
+            $values[] = $value ? '1' : '0';
+        } elseif (is_string($value)) {
+            $values[] = "'" . $this->cBD->real_escape_string($value) . "'";
+        } elseif ($value === NULL) {
+            $values[] = "NULL";
+        } else {
+            $values[] = $value;
+        }
+    }
+
+    // Vérifier que le nombre de valeurs correspond au nombre de colonnes
+    if (count($values) !== count($colonnes)) {
+        die("Erreur : Le nombre de valeurs ne correspond pas au nombre de colonnes.");
+    }
+
+    // Construire la requête d'insertion avec les noms de colonnes
+    $query = "INSERT INTO $strNomTable (" . implode(', ', $colonnes) . ") VALUES (" . implode(', ', $values) . ")";
+    $this->requete = $query;
+    $this->OK = $this->cBD->query($query);
+
+    if (!$this->OK) {
+        die("Erreur lors de l'insertion de l'enregistrement : " . $this->cBD->error);
+    }
+}
+
 }
 ?>

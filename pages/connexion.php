@@ -123,7 +123,11 @@
 
                 // Déconnexion
                 $mysql->deconnexion();
-                header("Location: ../pages/gestion_annonce.php");
+
+                $_SESSION['Courriel'] = $email;
+
+                
+                header("Location: ../pages/afficher_annonces.php");
                 exit();
             } else {
                 $_SESSION['errors'] = ["Mot de passe incorrect."];
@@ -132,10 +136,6 @@
 
         $mysql->deconnexion();
 
-       
-        $_SESSION['form_data'] = [
-            'email' => $email
-        ];
 
         
         header("Location: " . $_SERVER['PHP_SELF']);

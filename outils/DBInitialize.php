@@ -121,6 +121,50 @@ if ($count == 0) {
 
 }
 
+
+//Insertion des valeurs dans catégories
+$query = $mysql->cBD->prepare("SELECT COUNT(*) FROM categories");
+// Exécuter la requête
+$query->execute();
+
+// Récupérer le résultat
+$query->bind_result($count);
+$query->fetch();
+$query->close();
+
+if ($count == 0) {
+// Création des catégories
+$mysql->insereCategorie(
+    'categories',
+    1,                // NoCategories
+    "Location"        // Catégories
+);
+$mysql->insereCategorie(
+    'categories',
+    2,                // NoCategories
+    "Recherche"        // Catégories
+);
+$mysql->insereCategorie(
+    'categories',
+    3,                // NoCategories
+    "À vendre"        // Catégories
+);
+$mysql->insereCategorie(
+    'categories',
+    4,                // NoCategories
+    "À donner"        // Catégories
+);
+$mysql->insereCategorie(
+    'categories',
+    5,                // NoCategories
+    "Service offert"        // Catégories
+);
+$mysql->insereCategorie(
+    'categories',
+    6,                // NoCategories
+    "Autre"        // Catégories
+);
+}
 // Déconnexion
 $mysql->deconnexion();
 

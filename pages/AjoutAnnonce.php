@@ -11,7 +11,16 @@ try {
     die("Erreur de connexion à la base de données : " . $e->getMessage());
 }
 
-$noUtilisateur = 1; 
+$email = isset($_SESSION['Courriel']) ? $_SESSION['Courriel'] : "";
+
+$query = "SELECT * FROM utilisateurs WHERE Courriel = ?";
+$stmt = $mysql->cBD->prepare($query);
+$stmt->bind_param("s", $email);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+
+$noUtilisateur = $row['NoUtilisateur'];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $categorie = $_POST['categorie'];
@@ -48,6 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -55,6 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title>Ajouter une Annonce</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
     <div class="container mt-5">
         <h2>Ajouter une Annonce</h2>
@@ -76,7 +87,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
             <div class="form-group">
                 <label for="description_complete">Description complète :</label>
-                <textarea name="description_complete" id="description_complete" class="form-control" required></textarea>
+                <textarea name="description_complete" id="description_complete" class="form-control"
+                    required></textarea>
             </div>
             <div class="form-group">
                 <label for="prix">Prix :</label>
@@ -95,4 +107,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
+
 </html>

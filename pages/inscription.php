@@ -104,7 +104,7 @@ echo scriptVerification();
                     $sel = bin2hex(random_bytes(16)); // Génère un "salt" de 16 octets et le convertit en chaîne hexadécimale
     
                     // Hash du mot de passe avec le "salt" pour une sécurité accrue
-                    $passwordHashed = hash(HASH_TYPE, $password . $sel);
+                    $passwordHashed = hash(HASH_TYPE, $password);
 
                     // Appel de la fonction insereEnregistrement avec les valeurs correctes
                     enregistrementUtilsateur($mysql, $email, $passwordHashed);
