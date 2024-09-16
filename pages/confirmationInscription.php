@@ -50,7 +50,7 @@ include '../outils/DBConnexion.php';
                 //vérifier le statut du compte si en attente ou confirmé
                 if ($statut === 0) {
                     // Requête SQL préparée
-                    $query = $mysql->cBD->prepare("UPDATE utilisateurs SET Statut =9 WHERE Courriel = ?");
+                    $query = $mysql->cBD->prepare("UPDATE utilisateurs SET Statut = 9 WHERE Courriel = ?");
 
                     // Lier la variable $emailAdmin à ce "placeholder"
                     $query->bind_param('s', $email);
