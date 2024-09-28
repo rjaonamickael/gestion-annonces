@@ -19,7 +19,7 @@
                         if (isset($_SESSION['errors']) && in_array("Identifiant inexistant.", $_SESSION['errors'])) {
                             echo "Adresse email inexistant.";
                             unset($_SESSION['errors']); // Effacez les erreurs après les avoir affichées
-                        }else if(isset($_SESSION['errors']) && in_array("Adresse email non confirmée.", $_SESSION['errors'])){
+                        } else if (isset($_SESSION['errors']) && in_array("Adresse email non confirmée.", $_SESSION['errors'])) {
                             echo "Adresse email pas encore confirmée. Consultez votre boîte mail.";
                             unset($_SESSION['errors']);
                         }
@@ -33,7 +33,7 @@
                         autocomplete="off">
                     <p id="errMdp" class="text-danger font-weight-bold">
                         <?php
-                        
+
                         if (isset($_SESSION['errors']) && in_array("Mot de passe incorrect.", $_SESSION['errors'])) {
                             echo "Mot de passe incorrect.";
                             unset($_SESSION['errors']);
@@ -72,7 +72,7 @@
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         include('./outils/DBConnexion.php');
         require './configurations/security.config.php';
-        
+
 
         // Récupérer les données du formulaire
         $email = $_POST['tbEmail'];
@@ -100,35 +100,49 @@
         } else {
             $row = $result->fetch_assoc();
             $userId = $row['NoUtilisateur'];
-            
+
             // Recréer le hash avec le mot de passe fourni et le salt récupéré
             $passwordHashed = hash(HASH_TYPE, $password);
 
-            if($row['Statut'] == 0){
-                $_SESSION['errors'] = ["Adresse email non confirmée."];            
+            if ($row['Statut'] == 0) {
+                $_SESSION['errors'] = ["Adresse email non confirmée."];
             }
             // Vérifier le mot de passe
             else if ($passwordHashed === $row['MotDePasse']) {
-                // Connexion réussie
-                $queryUpdateUtilisateur = "UPDATE utilisateurs SET NbConnexions = NbConnexions + 1 WHERE NoUtilisateur = ?";
-                $stmtUpdate = $mysql->cBD->prepare($queryUpdateUtilisateur);
-                $stmtUpdate->bind_param("i", $userId);
-                $stmtUpdate->execute();
+                // //Vérification état de connexion
+                // $query = "SELECT * FROM connexions WHERE NoUtilisateur = ?";
+                // $stmt = $mysql->cBD->prepare($query);
+                // $stmt->bind_param("s", $userId);
+                // $stmt->execute();
+                // $result = $stmt->get_result();
+                // $row = $result->fetch_assoc();
+                
+                
+                
+                // if ($row['Deconnexion'] != '') {
+                    //Connexion réussie
+                    $queryUpdateUtilisateur = "UPDATE utilisateurs SET NbConnexions = NbConnexions + 1 WHERE NoUtilisateur = ?";
+                    $stmtUpdate = $mysql->cBD->prepare($queryUpdateUtilisateur);
+                    $stmtUpdate->bind_param("i", $userId);
+                    $stmtUpdate->execute();
 
-                // Insérer une ligne dans la table connexions
-                $queryInsertConnexion = "INSERT INTO connexions (NoUtilisateur, Connexion) VALUES (?, NOW())";
-                $stmtInsert = $mysql->cBD->prepare($queryInsertConnexion);
-                $stmtInsert->bind_param("i", $userId);
-                $stmtInsert->execute();
+                    // Insérer une ligne dans la table connexions
+                    $queryInsertConnexion = "INSERT INTO connexions (NoUtilisateur, Connexion) VALUES (?, NOW())";
+                    $stmtInsert = $mysql->cBD->prepare(query: $queryInsertConnexion);
+                    $stmtInsert->bind_param("i", $userId);
+                    $stmtInsert->execute();
+
+
+                // }
 
                 // Déconnexion
                 $mysql->deconnexion();
-
                 $_SESSION['Courriel'] = $email;
 
-                
+
                 header("Location: ../pages/afficher_annonces.php");
                 exit();
+
             } else {
                 $_SESSION['errors'] = ["Mot de passe incorrect."];
             }
@@ -137,7 +151,7 @@
         $mysql->deconnexion();
 
 
-        
+
         header("Location: " . $_SERVER['PHP_SELF']);
         exit();
     }
